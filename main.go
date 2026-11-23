@@ -71,6 +71,38 @@ func main() {
 		})
 	})
 
+	mux.HandleFunc("/sample", func(w http.ResponseWriter, r *http.Request) {
+		setHeaders(w)
+
+		if r.Method != http.MethodGet {
+			w.Header().Set("Allow", http.MethodGet)
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+		defer cancel()
+
+		var message string
+		err := db.QueryRowContext(
+			ctx,
+			"SELECT message FROM connection_test WHERE id = ?",
+			1,
+		).Scan(&message)
+
+		if err != nil {
+			log.Printf("Sample query failed: %v", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]string{
+				"message": "データを取得できませんでした",
+			})
+			return
+		}
+
+		json.NewEncoder(w).Encode(map[string]string{
+			"message": message,
+		})
+	})
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
