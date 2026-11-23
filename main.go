@@ -16,6 +16,7 @@ func main() {
 			return
 		}
 
+		w.Header().Set("Access-Control-Allow-Origin", "https://hackathon-frontend-seven-beta.vercel.app")
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(`{"status":"ok"}`))
 	})
