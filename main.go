@@ -20,6 +20,7 @@ func main() {
 	config.Addr = os.Getenv("MYSQL_SOCKET")
 	config.DBName = os.Getenv("MYSQL_DATABASE")
 	config.Timeout = 5 * time.Second
+	config.AllowCleartextPasswords = true
 
 	db, err := sql.Open("mysql", config.FormatDSN())
 	if err != nil {
